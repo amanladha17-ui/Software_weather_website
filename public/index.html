@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Weather Hub</title>
+    <!-- Load Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          /* Primary palette */
+          'sky-blue': '#3B82F6',
+          'deep-blue': '#1E3A8A',
+          'dark-slate': '#1E293B',
+
+          /* Secondary and neutral tones */
+          'soft-gray': '#F1F5F9',
+          'mid-gray': '#94A3B8',
+          'card-white': '#FFFFFF',
+
+          /* Vibrant accent tones */
+          'sun-yellow': '#FACC15',
+          'sunset-orange': '#FB923C',
+          'storm-purple': '#7C3AED',
+          'rain-blue': '#0EA5E9',
+          'alert-red': '#DC2626',
+          'wind-green': '#10B981',
+          'mint': '#5EEAD4',
+          'aqua': '#06B6D4',
+        },
+
+        backgroundImage: {
+          /* Dynamic background gradients for weather moods */
+          'sunny-gradient': 'linear-gradient(to bottom right, #FDE68A, #FACC15, #FB923C)',
+          'rainy-gradient': 'linear-gradient(to bottom right, #3B82F6, #0EA5E9, #06B6D4)',
+          'stormy-gradient': 'linear-gradient(to bottom right, #312E81, #7C3AED, #4F46E5)',
+          'clear-sky': 'linear-gradient(to bottom right, #A7F3D0, #6EE7B7, #5EEAD4)',
+          'evening-gradient': 'linear-gradient(to bottom right, #F59E0B, #F97316, #EF4444)',
+          'aurora-gradient': 'linear-gradient(to bottom right, #10B981, #06B6D4, #3B82F6)',
+        },
+
+        fontFamily: {
+          sans: ['Inter', 'Poppins', 'sans-serif'],
+        },
+
+        boxShadow: {
+          glow: '0 0 25px rgba(59, 130, 246, 0.4)',
+          warm: '0 0 20px rgba(251, 146, 60, 0.3)',
+          cool: '0 0 20px rgba(14, 165, 233, 0.3)',
+        },
+      },
+    },
+  };
+</script>
+
+
+    </script>
+    <!-- Link to Custom Styles -->
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="font-sans">
+
+    <!-- Firebase SDK Imports (Mandatory Setup for persistence) -->
+    <!-- This MUST be a module script for imports to work -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth;
+
+        // Initialize Firebase
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // Authentication using the provided token or anonymously
+            if (initialAuthToken) {
+                signInWithCustomToken(auth, initialAuthToken).then(userCredential => {
+                    console.log("Firebase signed in with custom token. User ID:", userCredential.user.uid);
+                }).catch(error => {
+                    console.error("Firebase custom sign-in failed:", error);
+                    signInAnonymously(auth); // Fallback to anonymous sign-in
+                });
+            } else {
+                signInAnonymously(auth).then(userCredential => {
+                    console.log("Firebase signed in anonymously. User ID:", userCredential.user.uid);
+                }).catch(error => {
+                    console.error("Firebase anonymous sign-in failed:", error);
+                });
+            }
+        } catch (error) {
+            console.error("Firebase Initialization Error:", error);
+        }
+    </script>
+
+    <div class="page-container p-4 sm:p-8">
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="fixed inset-0 bg-gray-900 bg-opacity-70 z-50 hidden flex justify-center items-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-sky-blue"></div>
+            <p class="text-white ml-4 text-lg">Fetching weather data...</p>
+        </div>
+
+        <!-- Notification Message Box (used instead of alert()) -->
+        <div id="messageBox" class="fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-xl z-50 hidden transition-opacity duration-300"></div>
+
+        <!-- LANDING PAGE (Default View) -->
+        <div id="landingPage" class="transition-opacity duration-500 ease-in-out">
+            <header class="text-center py-10 bg-white rounded-xl shadow-lg mb-8">
+                <h1 class="text-4xl font-extrabold text-dark-slate tracking-tight">SkyScope</h1>
+                <p class="text-lg text-gray-500 mt-2">“Real-time weather. Clear 7-day outlooks. One click away.”</p>
+            </header>
+
+            <!-- Search Section -->
+            <section class="mb-12">
+                <form id="searchForm" class="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
+                    <input type="text" id="searchInput" placeholder="Search a city name (e.g., Chicago, Mumbai, Berlin)..."
+                           class="flex-grow p-4 border-2 border-sky-blue rounded-xl focus:outline-none focus:ring-4 focus:ring-sky-blue/50 text-dark-slate shadow-md"
+                           required>
+                    <button type="submit"
+                            class="bg-sky-blue text-white font-semibold py-4 px-6 rounded-xl hover:bg-sky-blue/80 transition duration-200 shadow-lg active:scale-95">
+                        Get Weather
+                    </button>
+                </form>
+            </section>
+
+            <!-- Featured Cities Section -->
+            <section>
+                <h2 class="text-2xl font-bold text-dark-slate mb-6 border-b-2 border-sky-blue/50 pb-2">5 Popular Destinations</h2>
+                <div id="featuredCities" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                    <!-- City cards will be dynamically inserted here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- DETAILS PAGE (Hidden View) -->
+        <div id="detailsPage" class="hidden opacity-0 transition-opacity duration-500 ease-in-out">
+            <button id="backButton" class="text-sky-blue flex items-center mb-6 text-lg font-medium p-2 rounded-lg hover:bg-sky-blue/10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+                Back to Dashboard
+            </button>
+
+            <h1 id="detailsCityName" class="text-4xl font-extrabold text-dark-slate mb-6"></h1>
+
+            <!-- Current Weather and Key Details -->
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                <!-- Current Weather Card (Large) -->
+                <div id="currentWeatherCard" class="lg:col-span-2 bg-white p-8 rounded-2xl shadow-xl border-t-4 border-sky-blue">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-6xl font-light text-dark-slate"><span id="currentTemp">--</span>°C</p>
+                            <!-- <p class="text-xl text-gray-500 mt-1 capitalize"><span id="weatherDescription">Loading...</span></p> -->
+                        </div>
+                        <!-- Placeholder Icon -->
+                        <div id="currentWeatherIcon" class="text-7xl text-accent-yellow">☀️</div>
+                    </div>
+                    <!-- <div class="mt-6 grid grid-cols-2 gap-4 text-lg">
+                        <p class="flex items-center text-gray-700"><span class="font-bold w-24">High:</span> <span id="maxTemp">--</span>°C</p>
+                        <p class="flex items-center text-gray-700"><span class="font-bold w-24">Low:</span> <span id="minTemp">--</span>°C</p>
+                    </div> -->
+                </div>
+
+                <!-- Detail Metrics (Small Cards) -->
+                <div class="grid grid-cols-2 gap-4 lg:col-span-1">
+                    <div class="bg-white p-4 rounded-xl shadow-md flex flex-col items-center justify-center">
+                        <div class="text-2xl text-sky-blue mb-1">💧</div>
+                        <p class="text-sm text-gray-500">Humidity</p>
+                        <p id="humidity" class="text-xl font-bold text-dark-slate">--%</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-md flex flex-col items-center justify-center">
+                        <div class="text-2xl text-sky-blue mb-1">💨</div>
+                        <p class="text-sm text-gray-500">Wind Speed</p>
+                        <p id="windSpeed" class="text-xl font-bold text-dark-slate">-- km/h</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-md flex flex-col items-center justify-center">
+                        <div class="text-2xl text-accent-yellow mb-1">🌅</div>
+                        <p class="text-sm text-gray-500">Sunrise</p>
+                        <p id="sunriseTime" class="text-xl font-bold text-dark-slate">--</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-md flex flex-col items-center justify-center">
+                        <div class="text-2xl text-accent-yellow mb-1">🌇</div>
+                        <p class="text-sm text-gray-500">Sunset</p>
+                        <p id="sunsetTime" class="text-xl font-bold text-dark-slate">--</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7-Day Forecast Section -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold text-dark-slate mb-4 border-b-2 border-sky-blue/50 pb-2">7-Day Forecast</h2>
+                <div id="sevenDayForecast" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4">
+                    <!-- Daily forecast cards will be injected here -->
+                </div>
+            </section>
+
+            <!-- Alerts Section -->
+            <section>
+                <h2 class="text-2xl font-bold text-dark-slate mb-4 border-b-2 border-sky-blue/50 pb-2">Weather Alerts</h2>
+                <div id="alertSection" class="bg-white p-6 rounded-2xl shadow-xl">
+                    <p class="text-gray-500" id="alertMessage">No active weather alerts for this location.</p>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <!-- Link to client-side logic -->
+    <script src="./js/script.js"></script>
+</body>
+</html>

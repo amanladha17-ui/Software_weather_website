@@ -1,0 +1,199 @@
+/* =======================
+   🌤️ Global Styles
+   ======================= */
+
+body {
+    /* VIBRANT SUNSET GRADIENT BACKGROUND */
+background: linear-gradient(135deg, #00B4DB, #0083B0);
+
+    background-size: 400% 400%;
+    animation: gradientShift 12s ease infinite;
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #1E293B; /* dark-slate */
+    font-family: 'Inter', 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    transition: background 0.8s ease-in-out;
+}
+
+
+/* Smooth section transitions */
+.page-container {
+    max-width: 1200px;
+    width: 100%;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+/* =======================
+   🌈 Scrollbar Styling
+   ======================= */
+::-webkit-scrollbar { 
+    width: 10px; 
+}
+::-webkit-scrollbar-track { 
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+}
+::-webkit-scrollbar-thumb { 
+    background: linear-gradient(180deg, #3c687a, #2563EB);
+    border-radius: 20px; 
+}
+::-webkit-scrollbar-thumb:hover { 
+    background: linear-gradient(180deg, #2563EB, #1E3A8A);
+}
+
+/* =======================
+   🌦️ Weather Card Styles
+   ======================= */
+.weather-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(56, 189, 248, 0.25);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    border-left: 5px solid #38BDF8;
+}
+
+.weather-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(14, 165, 233, 0.4);
+}
+
+/* Weather type variations */
+.weather-card.sunny {
+    border-left-color: #FACC15;
+    background: linear-gradient(145deg, #FFF9C4, #FDE68A);
+    box-shadow: 0 10px 30px rgba(250, 204, 21, 0.4);
+}
+
+.weather-card.rainy {
+    border-left-color: #0EA5E9;
+    background: linear-gradient(145deg, #BFDBFE, #93C5FD);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+}
+
+.weather-card.stormy {
+    border-left-color: #7C3AED;
+    background: linear-gradient(145deg, #C7D2FE, #A78BFA);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+}
+
+.weather-card.clear {
+    border-left-color: #10B981;
+    background: linear-gradient(145deg, #D1FAE5, #A7F3D0);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+}
+
+/* =======================
+   🌇 Header / Hero Section
+   ======================= */
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+header p {
+    font-size: 1.2rem;
+    color: #E0F2FE;
+    opacity: 0.9;
+}
+
+/* =======================
+   🌤️ Back Button & Icons
+   ======================= */
+#backButton {
+    background: linear-gradient(90deg, #38BDF8, #2563EB);
+    color: white;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 15px rgba(37, 99, 235, 0.3);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+#backButton:hover {
+    background: linear-gradient(90deg, #2563EB, #1E3A8A);
+    transform: translateX(-6px);
+    box-shadow: 0 10px 25px rgba(30, 58, 138, 0.4);
+}
+
+/* =======================
+   🌈 Weather Details Section
+   ======================= */
+.details-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 12px 25px rgba(59, 130, 246, 0.2);
+}
+
+.details-container h2 {
+    color: #1E3A8A;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.details-container p {
+    color: #475569;
+    font-size: 1.1rem;
+}
+
+/* =======================
+   ☁️ Forecast Cards
+   ======================= */
+.forecast-card {
+    background: linear-gradient(145deg, #E0F2FE, #BFDBFE);
+    color: #1E3A8A;
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.25);
+    transition: all 0.3s ease;
+}
+
+.forecast-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4);
+}
+
+/* =======================
+   ⚠️ Alerts Section
+   ======================= */
+.alert-box {
+    background: linear-gradient(145deg, #FEE2E2, #FCA5A5);
+    border-left: 5px solid #DC2626;
+    color: #991B1B;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px rgba(220, 38, 38, 0.3);
+}
+
+/* =======================
+   🌠 Animations
+   ======================= */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.weather-card, .details-container, .forecast-card {
+    animation: fadeIn 0.6s ease both;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
